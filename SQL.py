@@ -5,9 +5,9 @@ class DataBase:
         self.database = sqlite3.connect('base.db')
         self.cursor = self.database.cursor()
         self.cursor.execute("CREATE TABLE IF NOT EXISTS objects ("
-                            "id SERIAL PRIMARY KEY, "
-                            "num VARCHAR(100) NOT NULL UNIQUE, "
-                            "title VARCHAR(100) NOT NULL UNIQUE"
+                            "id INTEGER PRIMARY KEY, "
+                            "num VARCHAR(100) NOT NULL, "
+                            "title VARCHAR(100) NOT NULL"
                             ")")
         self.database.commit()
 
@@ -18,11 +18,17 @@ class DataBase:
     def close(self):
         self.close()
 
-    def execute(self, command):
-        self.cursor.execute(command)
+    def getObjectNum(self, id):
+        return self.cursor.execute(f"SELECT num FROM objects WHERE id={id}").fetchall()[0][0]
 
-#####################тут тренировачные команды
-db = DataBase()
+    def getObjectTitle(self, id):
+        return self.cursor.execute(f"SELECT title FROM objects WHERE id={id}").fetchall()[0][0]
 
-db.execute("DROP TABLE objects")
-# db.execute("DELETE FROM objects")
+    def update_object(self, num, title, id):
+        self.cursor.execute("UPDATE objects SET num=?, title=? WHERE id=?", (num, title, id))
+
+
+
+#################тут тренировачные команды
+# db = DataBase()
+# db.cursor.execute("DROP TABLE objects")
