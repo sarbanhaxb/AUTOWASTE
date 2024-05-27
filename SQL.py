@@ -28,6 +28,11 @@ class DataBase:
         self.cursor.execute("UPDATE objects SET num=?, title=? WHERE id=?", (num, title, id))
 
 
+    def deletePosition(self, id):
+        self.cursor.execute("DELETE FROM objects WHERE id=?", (id, ))
+
+    def DBcommit(self):
+        self.database.commit()
 
 #################тут тренировачные команды
 # db = DataBase()

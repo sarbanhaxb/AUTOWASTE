@@ -1,4 +1,5 @@
 import tkinter as tk
+import tkinter.messagebox
 from tkinter import ttk
 import colors
 import SQL
@@ -24,11 +25,17 @@ class MainProg(tk.Frame):
 
         # Кнопка редактирования позиции
         btnEditDialog = tk.Button(toolbar,
-                                    text='Редактировать',
+                                    text='Редактировать позицию',
                                     command=self.open_update_dialog,
                                     compound=tk.TOP)
-
         btnEditDialog.pack(side=tk.LEFT)
+
+        # Кнопка удаления позиции
+        btnDelDialog = tk.Button(toolbar,
+                                    text='Удалить позицию',
+                                    command=self.deletePosition,
+                                    compound=tk.TOP)
+        btnDelDialog.pack(side=tk.LEFT)
 
         #дерево на главном экране
         self.tree = ttk.Treeview(self, columns=('id', 'Шифр', 'Название объекта'), height=18, show='headings')
@@ -57,7 +64,18 @@ class MainProg(tk.Frame):
         [self.tree.insert('', 'end', values=row) for row in self.db.cursor.fetchall()]
 
     def open_update_dialog(self):
-        Update(self.tree.item(self.tree.focus())["values"][0])
+        try:
+            Update(self.tree.item(self.tree.focus())["values"][0])
+        except IndexError:
+            tk.messagebox.showerror('Ошибка', 'Не выбрана позиция', )
+
+    def deletePosition(self):
+        try:
+            self.db.deletePosition(self.tree.item(self.tree.focus())["values"][0])
+        except IndexError:
+            tk.messagebox.showerror('Ошибка', 'Не выбрана позиция', )
+        self.view_records()
+        self.db.DBcommit()
 
 class NewObjectDialog(tk.Toplevel):
     def __init__(self):
@@ -89,8 +107,8 @@ class NewObjectDialog(tk.Toplevel):
         #Кнопка добавления
         self.btn_ok = ttk.Button(self, text='Добавить', command=self.destroy)
         self.btn_ok.place(x=190, y=110)
-        self.btn_ok.bind('<Button-1>', lambda event: self.view.records(
-            self.entry_number.get(), self.entry_title.get()))
+        self.btn_ok.bind('<Button-1>',
+                         lambda event: self.view.records(self.entry_number.get(), self.entry_title.get()))
 
         self.grab_set()
         self.focus_set()
@@ -142,7 +160,7 @@ if __name__ == "__main__":
     DATABASE = SQL.DataBase()
     app = MainProg(root)
     app.pack()
-    root.title("Название программы")
+    root.title("Расчет нормативов образования отходов v.01")
     root.geometry("650x450+300+200")
     root.resizable(False, False)
     root.mainloop()
