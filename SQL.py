@@ -1,7 +1,6 @@
 import sqlite3
 import pandas as pd
-import requests
-import urllib.request
+
 
 class DataBase:
     def __init__(self):

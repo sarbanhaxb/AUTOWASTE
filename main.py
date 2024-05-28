@@ -37,6 +37,13 @@ class MainProg(tk.Frame):
                                     compound=tk.TOP)
         btnDelDialog.pack(side=tk.LEFT)
 
+        # Кнопка выбора объекта
+        btnOpenObject = tk.Button(root,
+                                  text='Выбрать объект',
+                                  command=self.OpenObjectWindow,
+                                  compound=tk.CENTER)
+        btnOpenObject.place(x=540, y=420)
+
         #дерево на главном экране
         self.tree = ttk.Treeview(self, columns=('id', 'Шифр', 'Название объекта'), height=18, show='headings')
         self.tree.column('id', width=30, anchor='nw')
@@ -70,12 +77,16 @@ class MainProg(tk.Frame):
             tk.messagebox.showerror('Ошибка', 'Не выбрана позиция')
 
     def deletePosition(self):
-        try:
-            self.db.deletePosition(self.tree.item(self.tree.focus())["values"][0])
-        except IndexError:
-            tk.messagebox.showerror('Ошибка', 'Не выбрана позиция')
-        self.view_records()
-        self.db.DBcommit()
+        if tk.messagebox.askyesno('Удаление объекта', 'Вы уверены, что хотите удалить объект?\nБудет удалена вся информация об объекте...'):
+            try:
+                self.db.deletePosition(self.tree.item(self.tree.focus())["values"][0])
+            except IndexError:
+                tk.messagebox.showerror('Ошибка', 'Не выбрана позиция')
+            self.view_records()
+            self.db.DBcommit()
+
+    def OpenObjectWindow(self):
+        pass
 
 class NewObjectDialog(tk.Toplevel):
     def __init__(self):
