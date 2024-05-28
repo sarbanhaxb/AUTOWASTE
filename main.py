@@ -67,13 +67,13 @@ class MainProg(tk.Frame):
         try:
             Update(self.tree.item(self.tree.focus())["values"][0])
         except IndexError:
-            tk.messagebox.showerror('Ошибка', 'Не выбрана позиция', )
+            tk.messagebox.showerror('Ошибка', 'Не выбрана позиция')
 
     def deletePosition(self):
         try:
             self.db.deletePosition(self.tree.item(self.tree.focus())["values"][0])
         except IndexError:
-            tk.messagebox.showerror('Ошибка', 'Не выбрана позиция', )
+            tk.messagebox.showerror('Ошибка', 'Не выбрана позиция')
         self.view_records()
         self.db.DBcommit()
 

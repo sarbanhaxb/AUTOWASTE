@@ -1,4 +1,7 @@
 import sqlite3
+import pandas as pd
+import requests
+import urllib.request
 
 class DataBase:
     def __init__(self):
@@ -10,6 +13,8 @@ class DataBase:
                             "title VARCHAR(100) NOT NULL"
                             ")")
         self.database.commit()
+        if not self.cursor.execute("SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE type='table' AND name='fkko');").fetchone()[0]:
+            self.createFKKO()
 
     def insertObject(self, num, title):
         self.cursor.execute(f"INSERT INTO objects (num, title) VALUES (?, ?)", (num, title))
@@ -34,6 +39,19 @@ class DataBase:
     def DBcommit(self):
         self.database.commit()
 
+    def createFKKO(self):
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS fkko ("
+                            "id INTEGER PRIMARY KEY, "
+                            "num VARCHAR(30) NOT NULL, "
+                            "title VARCHAR(300) NOT NULL"
+                            ")")
+
+        BDO = pd.read_excel("https://rpn.gov.ru/upload/iblock/22b/6kwwkka1n6d2r4yznwz2dqqlhlzrxy60/bank_dannykh_ob_otkhodakh-_3_.xlsx", skiprows=3)
+        for row in BDO.itertuples():
+            self.cursor.execute(f"INSERT INTO fkko (num, title) VALUES (?, ?)", (str(row[1]), str(row[2])))
+            self.database.commit()
+
+
 #################тут тренировачные команды
 # db = DataBase()
-# db.cursor.execute("DROP TABLE objects")
+# db.cursor.execute("DROP TABLE fkko")
