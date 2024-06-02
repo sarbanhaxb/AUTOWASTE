@@ -52,6 +52,7 @@ class MainProg(tk.Frame):
         self.tree.heading('id', text='id')
         self.tree.heading('Шифр', text='Шифр')
         self.tree.heading('Название объекта', text='Название объекта')
+        self.tree.bind("<Double-1>", self.OnDoubleClick)
         self.tree.pack()
 
     def openDialogNewObject(self):
@@ -77,7 +78,7 @@ class MainProg(tk.Frame):
             tk.messagebox.showerror('Ошибка', 'Не выбрана позиция')
 
     def deletePosition(self):
-        if tk.messagebox.askyesno('Удаление объекта', 'Вы уверены, что хотите удалить объект?\nБудет удалена вся информация об объекте...'):
+        if tk.messagebox.askyesno('Удаление объекта', 'При удалении объекта, будет стерта вся информация о нем.\nУверены, что хотите удалить?'):
             try:
                 self.db.deletePosition(self.tree.item(self.tree.focus())["values"][0])
             except IndexError:
@@ -86,7 +87,13 @@ class MainProg(tk.Frame):
             self.db.DBcommit()
 
     def OpenObjectWindow(self):
-        pass
+        try:
+            OpenObject(self.tree.item(self.tree.focus())["values"][0])
+        except IndexError:
+            tk.messagebox.showwarning("Предупреждение", "Не выбран объект!")
+
+    def OnDoubleClick(self, event):
+        OpenObject(self.tree.item(self.tree.focus())["values"][0])
 
 class NewObjectDialog(tk.Toplevel):
     def __init__(self):
@@ -112,8 +119,8 @@ class NewObjectDialog(tk.Toplevel):
         self.entry_title.place(x=150, y=55)
 
         #Кнопка закрытия
-        btn_close = ttk.Button(self, text='Закрыть', command=self.destroy)
-        btn_close.place(x=270, y=110)
+        self.btn_close = ttk.Button(self, text='Закрыть', command=self.destroy)
+        self.btn_close.place(x=270, y=110)
 
         #Кнопка добавления
         self.btn_ok = ttk.Button(self, text='Добавить', command=self.destroy)
@@ -164,6 +171,54 @@ class Update(tk.Toplevel):
 
         self.grab_set()
         self.focus_set()
+
+
+class OpenObject(tk.Toplevel):
+    def __init__(self, index):
+        super().__init__()
+        self.db = DATABASE
+        self.__index = index
+        self.initObjectMenu()
+
+    def initObjectMenu(self):
+
+        self.title(f'{self.db.getObjectNum(self.__index)} {self.db.getObjectTitle(self.__index)}')
+        self.geometry('650x450+300+200')
+
+        self.tree = ttk.Treeview(self, columns=('id', 'код ФККО', 'Наименование отхода', 'Норматив образования, т'), height=18, show='headings')
+        self.tree.column('id', width=30, anchor='nw')
+        self.tree.column('код ФККО', width=100, anchor='nw')
+        self.tree.column('Наименование отхода', width=250, anchor='nw')
+        self.tree.column('Норматив образования, т', width=200, anchor='nw')
+        self.tree.heading('id', text='id')
+        self.tree.heading('код ФККО', text='код ФККО')
+        self.tree.heading('Наименование отхода', text='Наименование отхода')
+        self.tree.heading('Норматив образования, т', text='Норматив образования, т')
+        self.tree.pack()
+
+
+
+        btnDialogNewObject = tk.Button(self,
+                                       text='Добавить отход',
+                                       compound=tk.TOP, command=self.addWaste)
+        btnDialogNewObject.place(x=475, y=400)
+
+        """Тут будут кнопки:
+        1. Добавления отхода;"""
+
+        self.grab_set()
+        self.focus_set()
+
+    def addWaste(self):
+        print('YES')
+
+
+# class FKKO(tk.Toplevel):
+#     def __init__(self, index):
+#         super().__init__()
+#         self.db = DATABASE
+#         self.__index = index
+#         self.initFKKOwindow()
 
 
 if __name__ == "__main__":

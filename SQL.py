@@ -11,6 +11,14 @@ class DataBase:
                             "num VARCHAR(100) NOT NULL, "
                             "title VARCHAR(100) NOT NULL"
                             ")")
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS object("
+                            "id INTEGER PRIMARY KEY,"
+                            "id_object INTEGER,"
+                            "codeFKKO VARCHAR(30),"
+                            "wasteTitle VARCHAR(300),"
+                            "quantity FLOAT,"
+                            "FOREIGN KEY (id_object) REFERENCES objects(id)" 
+                            ")")
         self.database.commit()
         if not self.cursor.execute("SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE type='table' AND name='fkko');").fetchone()[0]:
             self.createFKKO()
@@ -38,6 +46,9 @@ class DataBase:
     def DBcommit(self):
         self.database.commit()
 
+    def getFKKO(self) -> list:
+        return self.cursor.execute("SELECT * FROM fkko").fetchall()
+
     def createFKKO(self):
         self.cursor.execute("CREATE TABLE IF NOT EXISTS fkko ("
                             "id INTEGER PRIMARY KEY, "
@@ -52,5 +63,5 @@ class DataBase:
 
 
 #################тут тренировачные команды
-# db = DataBase()
-# db.cursor.execute("DROP TABLE fkko")
+db = DataBase()
+db.cursor.execute("DROP TABLE fkko")
